@@ -1,0 +1,159 @@
+<html>
+<head>
+<title>cnn.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #629755; font-style: italic;}
+.s4 { color: #6897bb;}
+.s5 { color: #808080;}
+.ln { color: #606366; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+cnn.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<a name="l2"><span class="ln">2    </span></a>
+<a name="l3"><span class="ln">3    </span></a><span class="s0">from </span><span class="s1">nndl.layers </span><span class="s0">import </span><span class="s1">*</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0">from </span><span class="s1">nndl.conv_layers </span><span class="s0">import </span><span class="s1">*</span>
+<a name="l5"><span class="ln">5    </span></a><span class="s0">from </span><span class="s1">cs231n.fast_layers </span><span class="s0">import </span><span class="s1">*</span>
+<a name="l6"><span class="ln">6    </span></a><span class="s0">from </span><span class="s1">nndl.layer_utils </span><span class="s0">import </span><span class="s1">*</span>
+<a name="l7"><span class="ln">7    </span></a><span class="s0">from </span><span class="s1">nndl.conv_layer_utils </span><span class="s0">import </span><span class="s1">*</span>
+<a name="l8"><span class="ln">8    </span></a>
+<a name="l9"><span class="ln">9    </span></a><span class="s0">import </span><span class="s1">pdb</span>
+<a name="l10"><span class="ln">10   </span></a>
+<a name="l11"><span class="ln">11   </span></a><span class="s2">&quot;&quot;&quot;  
+<a name="l12"><span class="ln">12   </span></a>This code was originally written for CS 231n at Stanford University 
+<a name="l13"><span class="ln">13   </span></a>(cs231n.stanford.edu).  It has been modified in various areas for use in the 
+<a name="l14"><span class="ln">14   </span></a>ECE 239AS class at UCLA.  This includes the descriptions of what code to 
+<a name="l15"><span class="ln">15   </span></a>implement as well as some slight potential changes in variable names to be 
+<a name="l16"><span class="ln">16   </span></a>consistent with class nomenclature.  We thank Justin Johnson &amp; Serena Yeung for 
+<a name="l17"><span class="ln">17   </span></a>permission to use this code.  To see the original version, please visit 
+<a name="l18"><span class="ln">18   </span></a>cs231n.stanford.edu.   
+<a name="l19"><span class="ln">19   </span></a>&quot;&quot;&quot;</span>
+<a name="l20"><span class="ln">20   </span></a>
+<a name="l21"><span class="ln">21   </span></a><span class="s0">class </span><span class="s1">ThreeLayerConvNet(object):</span>
+<a name="l22"><span class="ln">22   </span></a>  <span class="s3">&quot;&quot;&quot; 
+<a name="l23"><span class="ln">23   </span></a>  A three-layer convolutional network with the following architecture: 
+<a name="l24"><span class="ln">24   </span></a>   
+<a name="l25"><span class="ln">25   </span></a>  conv - relu - 2x2 max pool - affine - relu - affine - softmax 
+<a name="l26"><span class="ln">26   </span></a>   
+<a name="l27"><span class="ln">27   </span></a>  The network operates on minibatches of data that have shape (N, C, H, W) 
+<a name="l28"><span class="ln">28   </span></a>  consisting of N images, each with height H and width W and with C input 
+<a name="l29"><span class="ln">29   </span></a>  channels. 
+<a name="l30"><span class="ln">30   </span></a>  &quot;&quot;&quot;</span>
+<a name="l31"><span class="ln">31   </span></a>  
+<a name="l32"><span class="ln">32   </span></a>  <span class="s0">def </span><span class="s1">__init__(self</span><span class="s0">, </span><span class="s1">input_dim=(</span><span class="s4">3</span><span class="s0">, </span><span class="s4">32</span><span class="s0">, </span><span class="s4">32</span><span class="s1">)</span><span class="s0">, </span><span class="s1">num_filters=</span><span class="s4">32</span><span class="s0">, </span><span class="s1">filter_size=</span><span class="s4">7</span><span class="s0">,</span>
+<a name="l33"><span class="ln">33   </span></a>               <span class="s1">hidden_dim=</span><span class="s4">100</span><span class="s0">, </span><span class="s1">num_classes=</span><span class="s4">10</span><span class="s0">, </span><span class="s1">weight_scale=</span><span class="s4">1e-3</span><span class="s0">, </span><span class="s1">reg=</span><span class="s4">0.0</span><span class="s0">,</span>
+<a name="l34"><span class="ln">34   </span></a>               <span class="s1">dtype=np.float32</span><span class="s0">, </span><span class="s1">use_batchnorm=</span><span class="s0">False</span><span class="s1">):</span>
+<a name="l35"><span class="ln">35   </span></a>    <span class="s3">&quot;&quot;&quot; 
+<a name="l36"><span class="ln">36   </span></a>    Initialize a new network. 
+<a name="l37"><span class="ln">37   </span></a>     
+<a name="l38"><span class="ln">38   </span></a>    Inputs: 
+<a name="l39"><span class="ln">39   </span></a>    - input_dim: Tuple (C, H, W) giving size of input data 
+<a name="l40"><span class="ln">40   </span></a>    - num_filters: Number of filters to use in the convolutional layer 
+<a name="l41"><span class="ln">41   </span></a>    - filter_size: Size of filters to use in the convolutional layer 
+<a name="l42"><span class="ln">42   </span></a>    - hidden_dim: Number of units to use in the fully-connected hidden layer 
+<a name="l43"><span class="ln">43   </span></a>    - num_classes: Number of scores to produce from the final affine layer. 
+<a name="l44"><span class="ln">44   </span></a>    - weight_scale: Scalar giving standard deviation for random initialization 
+<a name="l45"><span class="ln">45   </span></a>      of weights. 
+<a name="l46"><span class="ln">46   </span></a>    - reg: Scalar giving L2 regularization strength 
+<a name="l47"><span class="ln">47   </span></a>    - dtype: numpy datatype to use for computation. 
+<a name="l48"><span class="ln">48   </span></a>    &quot;&quot;&quot;</span>
+<a name="l49"><span class="ln">49   </span></a>    <span class="s1">self.use_batchnorm = use_batchnorm</span>
+<a name="l50"><span class="ln">50   </span></a>    <span class="s1">self.params = {}</span>
+<a name="l51"><span class="ln">51   </span></a>    <span class="s1">self.reg = reg</span>
+<a name="l52"><span class="ln">52   </span></a>    <span class="s1">self.dtype = dtype</span>
+<a name="l53"><span class="ln">53   </span></a>
+<a name="l54"><span class="ln">54   </span></a>    
+<a name="l55"><span class="ln">55   </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l56"><span class="ln">56   </span></a>    <span class="s5"># YOUR CODE HERE:</span>
+<a name="l57"><span class="ln">57   </span></a>    <span class="s5">#   Initialize the weights and biases of a three layer CNN. To initialize:</span>
+<a name="l58"><span class="ln">58   </span></a>    <span class="s5">#     - the biases should be initialized to zeros.</span>
+<a name="l59"><span class="ln">59   </span></a>    <span class="s5">#     - the weights should be initialized to a matrix with entries</span>
+<a name="l60"><span class="ln">60   </span></a>    <span class="s5">#         drawn from a Gaussian distribution with zero mean and </span>
+<a name="l61"><span class="ln">61   </span></a>    <span class="s5">#         standard deviation given by weight_scale.</span>
+<a name="l62"><span class="ln">62   </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l63"><span class="ln">63   </span></a>
+<a name="l64"><span class="ln">64   </span></a>    <span class="s1">self.params[</span><span class="s2">'b1'</span><span class="s1">] = np.zeros((num_filters))</span>
+<a name="l65"><span class="ln">65   </span></a>    <span class="s1">self.params[</span><span class="s2">'b2'</span><span class="s1">] = np.zeros((hidden_dim))</span>
+<a name="l66"><span class="ln">66   </span></a>    <span class="s1">self.params[</span><span class="s2">'b3'</span><span class="s1">] = np.zeros((num_classes))</span>
+<a name="l67"><span class="ln">67   </span></a>    <span class="s1">self.params[</span><span class="s2">'W1'</span><span class="s1">] = np.random.normal(</span><span class="s4">0</span><span class="s0">, </span><span class="s1">weight_scale</span><span class="s0">, </span><span class="s1">size=(num_filters</span><span class="s0">, </span><span class="s1">input_dim[</span><span class="s4">0</span><span class="s1">]</span><span class="s0">, </span><span class="s1">filter_size</span><span class="s0">, </span><span class="s1">filter_size))</span>
+<a name="l68"><span class="ln">68   </span></a>    <span class="s1">self.params[</span><span class="s2">'W2'</span><span class="s1">] = np.random.normal(</span><span class="s4">0</span><span class="s0">, </span><span class="s1">weight_scale</span><span class="s0">, </span><span class="s1">size=(int(((input_dim[</span><span class="s4">1</span><span class="s1">] - </span><span class="s4">2</span><span class="s1">) / </span><span class="s4">2 </span><span class="s1">+ </span><span class="s4">1</span><span class="s1">) *</span>
+<a name="l69"><span class="ln">69   </span></a>                                                               <span class="s1">((input_dim[</span><span class="s4">2</span><span class="s1">] - </span><span class="s4">2</span><span class="s1">) / </span><span class="s4">2 </span><span class="s1">+ </span><span class="s4">1</span><span class="s1">) * num_filters)</span><span class="s0">,</span>
+<a name="l70"><span class="ln">70   </span></a>                                                                <span class="s1">hidden_dim))</span>
+<a name="l71"><span class="ln">71   </span></a>    <span class="s1">self.params[</span><span class="s2">'W3'</span><span class="s1">] = np.random.normal(</span><span class="s4">0</span><span class="s0">, </span><span class="s1">weight_scale</span><span class="s0">, </span><span class="s1">size=(hidden_dim</span><span class="s0">, </span><span class="s1">num_classes))</span>
+<a name="l72"><span class="ln">72   </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l73"><span class="ln">73   </span></a>    <span class="s5"># END YOUR CODE HERE</span>
+<a name="l74"><span class="ln">74   </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l75"><span class="ln">75   </span></a>
+<a name="l76"><span class="ln">76   </span></a>    <span class="s0">for </span><span class="s1">k</span><span class="s0">, </span><span class="s1">v </span><span class="s0">in </span><span class="s1">self.params.items():</span>
+<a name="l77"><span class="ln">77   </span></a>      <span class="s1">self.params[k] = v.astype(dtype)</span>
+<a name="l78"><span class="ln">78   </span></a>     
+<a name="l79"><span class="ln">79   </span></a> 
+<a name="l80"><span class="ln">80   </span></a>  <span class="s0">def </span><span class="s1">loss(self</span><span class="s0">, </span><span class="s1">X</span><span class="s0">, </span><span class="s1">y=</span><span class="s0">None</span><span class="s1">):</span>
+<a name="l81"><span class="ln">81   </span></a>    <span class="s3">&quot;&quot;&quot; 
+<a name="l82"><span class="ln">82   </span></a>    Evaluate loss and gradient for the three-layer convolutional network. 
+<a name="l83"><span class="ln">83   </span></a>     
+<a name="l84"><span class="ln">84   </span></a>    Input / output: Same API as TwoLayerNet in fc_net.py. 
+<a name="l85"><span class="ln">85   </span></a>    &quot;&quot;&quot;</span>
+<a name="l86"><span class="ln">86   </span></a>    <span class="s1">W1</span><span class="s0">, </span><span class="s1">b1 = self.params[</span><span class="s2">'W1'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">self.params[</span><span class="s2">'b1'</span><span class="s1">]</span>
+<a name="l87"><span class="ln">87   </span></a>    <span class="s1">W2</span><span class="s0">, </span><span class="s1">b2 = self.params[</span><span class="s2">'W2'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">self.params[</span><span class="s2">'b2'</span><span class="s1">]</span>
+<a name="l88"><span class="ln">88   </span></a>    <span class="s1">W3</span><span class="s0">, </span><span class="s1">b3 = self.params[</span><span class="s2">'W3'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">self.params[</span><span class="s2">'b3'</span><span class="s1">]</span>
+<a name="l89"><span class="ln">89   </span></a>    
+<a name="l90"><span class="ln">90   </span></a>    <span class="s5"># pass conv_param to the forward pass for the convolutional layer</span>
+<a name="l91"><span class="ln">91   </span></a>    <span class="s1">filter_size = W1.shape[</span><span class="s4">2</span><span class="s1">]</span>
+<a name="l92"><span class="ln">92   </span></a>    <span class="s1">conv_param = {</span><span class="s2">'stride'</span><span class="s1">: </span><span class="s4">1</span><span class="s0">, </span><span class="s2">'pad'</span><span class="s1">: (filter_size - </span><span class="s4">1</span><span class="s1">) / </span><span class="s4">2</span><span class="s1">}</span>
+<a name="l93"><span class="ln">93   </span></a>
+<a name="l94"><span class="ln">94   </span></a>    <span class="s5"># pass pool_param to the forward pass for the max-pooling layer</span>
+<a name="l95"><span class="ln">95   </span></a>    <span class="s1">pool_param = {</span><span class="s2">'pool_height'</span><span class="s1">: </span><span class="s4">2</span><span class="s0">, </span><span class="s2">'pool_width'</span><span class="s1">: </span><span class="s4">2</span><span class="s0">, </span><span class="s2">'stride'</span><span class="s1">: </span><span class="s4">2</span><span class="s1">}</span>
+<a name="l96"><span class="ln">96   </span></a>
+<a name="l97"><span class="ln">97   </span></a>    <span class="s1">scores = </span><span class="s0">None</span>
+<a name="l98"><span class="ln">98   </span></a>    
+<a name="l99"><span class="ln">99   </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l100"><span class="ln">100  </span></a>    <span class="s5"># YOUR CODE HERE:</span>
+<a name="l101"><span class="ln">101  </span></a>    <span class="s5">#   Implement the forward pass of the three layer CNN.  Store the output</span>
+<a name="l102"><span class="ln">102  </span></a>    <span class="s5">#   scores as the variable &quot;scores&quot;.</span>
+<a name="l103"><span class="ln">103  </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l104"><span class="ln">104  </span></a>    <span class="s1">conv_out</span><span class="s0">, </span><span class="s1">conv_cache = conv_relu_pool_forward(X</span><span class="s0">, </span><span class="s1">W1</span><span class="s0">, </span><span class="s1">b1</span><span class="s0">, </span><span class="s1">conv_param</span><span class="s0">, </span><span class="s1">pool_param)</span>
+<a name="l105"><span class="ln">105  </span></a>    <span class="s1">affine1_out</span><span class="s0">, </span><span class="s1">affine1_cache = affine_relu_forward(conv_out</span><span class="s0">, </span><span class="s1">W2</span><span class="s0">, </span><span class="s1">b2)</span>
+<a name="l106"><span class="ln">106  </span></a>    <span class="s1">scores</span><span class="s0">, </span><span class="s1">affine2_cache = affine_forward(affine1_out</span><span class="s0">, </span><span class="s1">W3</span><span class="s0">, </span><span class="s1">b3)</span>
+<a name="l107"><span class="ln">107  </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l108"><span class="ln">108  </span></a>    <span class="s5"># END YOUR CODE HERE</span>
+<a name="l109"><span class="ln">109  </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l110"><span class="ln">110  </span></a>
+<a name="l111"><span class="ln">111  </span></a>    <span class="s0">if </span><span class="s1">y </span><span class="s0">is None</span><span class="s1">:</span>
+<a name="l112"><span class="ln">112  </span></a>      <span class="s0">return </span><span class="s1">scores</span>
+<a name="l113"><span class="ln">113  </span></a>    
+<a name="l114"><span class="ln">114  </span></a>    <span class="s1">loss</span><span class="s0">, </span><span class="s1">grads = </span><span class="s4">0</span><span class="s0">, </span><span class="s1">{}</span>
+<a name="l115"><span class="ln">115  </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l116"><span class="ln">116  </span></a>    <span class="s5"># YOUR CODE HERE:</span>
+<a name="l117"><span class="ln">117  </span></a>    <span class="s5">#   Implement the backward pass of the three layer CNN.  Store the grads</span>
+<a name="l118"><span class="ln">118  </span></a>    <span class="s5">#   in the grads dictionary, exactly as before (i.e., the gradient of </span>
+<a name="l119"><span class="ln">119  </span></a>    <span class="s5">#   self.params[k] will be grads[k]).  Store the loss as &quot;loss&quot;, and</span>
+<a name="l120"><span class="ln">120  </span></a>    <span class="s5">#   don't forget to add regularization on ALL weight matrices.</span>
+<a name="l121"><span class="ln">121  </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l122"><span class="ln">122  </span></a>    <span class="s1">loss</span><span class="s0">, </span><span class="s1">dout = softmax_loss(scores</span><span class="s0">, </span><span class="s1">y)</span>
+<a name="l123"><span class="ln">123  </span></a>    <span class="s1">loss += </span><span class="s4">0.5 </span><span class="s1">* self.reg * ((np.linalg.norm(self.params[</span><span class="s2">'W1'</span><span class="s1">] ** </span><span class="s4">2</span><span class="s1">)) + (np.linalg.norm(self.params[</span><span class="s2">'W2'</span><span class="s1">] ** </span><span class="s4">2</span><span class="s1">)) +</span>
+<a name="l124"><span class="ln">124  </span></a>                              <span class="s1">(np.linalg.norm(self.params[</span><span class="s2">'W3'</span><span class="s1">] ** </span><span class="s4">2</span><span class="s1">)))</span>
+<a name="l125"><span class="ln">125  </span></a>    <span class="s1">dout</span><span class="s0">, </span><span class="s1">grads[</span><span class="s2">'W3'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">grads[</span><span class="s2">'b3'</span><span class="s1">] = affine_backward(dout</span><span class="s0">, </span><span class="s1">affine2_cache)</span>
+<a name="l126"><span class="ln">126  </span></a>    <span class="s1">dout</span><span class="s0">, </span><span class="s1">grads[</span><span class="s2">'W2'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">grads[</span><span class="s2">'b2'</span><span class="s1">] = affine_relu_backward(dout</span><span class="s0">, </span><span class="s1">affine1_cache)</span>
+<a name="l127"><span class="ln">127  </span></a>    <span class="s1">dout</span><span class="s0">, </span><span class="s1">grads[</span><span class="s2">'W1'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">grads[</span><span class="s2">'b1'</span><span class="s1">] = conv_relu_pool_backward(dout</span><span class="s0">, </span><span class="s1">conv_cache)</span>
+<a name="l128"><span class="ln">128  </span></a>
+<a name="l129"><span class="ln">129  </span></a>    <span class="s1">grads[</span><span class="s2">'W3'</span><span class="s1">] += self.reg * self.params[</span><span class="s2">'W3'</span><span class="s1">]</span>
+<a name="l130"><span class="ln">130  </span></a>    <span class="s1">grads[</span><span class="s2">'W2'</span><span class="s1">] += self.reg * self.params[</span><span class="s2">'W2'</span><span class="s1">]</span>
+<a name="l131"><span class="ln">131  </span></a>    <span class="s1">grads[</span><span class="s2">'W1'</span><span class="s1">] += self.reg * self.params[</span><span class="s2">'W1'</span><span class="s1">]</span>
+<a name="l132"><span class="ln">132  </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l133"><span class="ln">133  </span></a>    <span class="s5"># END YOUR CODE HERE</span>
+<a name="l134"><span class="ln">134  </span></a>    <span class="s5"># ================================================================ #</span>
+<a name="l135"><span class="ln">135  </span></a>
+<a name="l136"><span class="ln">136  </span></a>    <span class="s0">return </span><span class="s1">loss</span><span class="s0">, </span><span class="s1">grads</span>
+<a name="l137"><span class="ln">137  </span></a></pre>
+</body>
+</html>

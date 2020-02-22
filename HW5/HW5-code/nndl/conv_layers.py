@@ -219,8 +219,9 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
   #   You may find it useful to use the batchnorm forward pass you 
   #   implemented in HW #4.
   # ================================================================ #
-  
-  out = np.array(batchnorm_forward(x.reshape(x.swapaxes(0,1).reshape(x.shape[1], -1).T, gamma, beta, bn_param))
+  x_hat = x.swapaxes(0, 1).reshape(x.shape[1], -1).T
+  out, cache = np.array(batchnorm_forward(x_hat, gamma, beta, bn_param))
+  out = out.reshape(x.shape[0], x.shape[2], x.shape[3], -1).swapaxes(1, 3).swapaxes(2, 3)
 
   # ================================================================ #
   # END YOUR CODE HERE
@@ -251,7 +252,10 @@ def spatial_batchnorm_backward(dout, cache):
   #   You may find it useful to use the batchnorm forward pass you 
   #   implemented in HW #4.
   # ================================================================ #
-  
+
+  dout_hat = dout.swapaxes(0, 1).reshape(dout.shape[1], -1).T
+  dx, dgamma, dbeta = np.array(batchnorm_backward(dout_hat, cache))
+  dx = dx.reshape(dout.shape[0], dout.shape[2], dout.shape[3], -1).swapaxes(1, 3).swapaxes(2, 3)
 
   # ================================================================ #
   # END YOUR CODE HERE
