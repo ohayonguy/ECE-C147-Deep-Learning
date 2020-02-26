@@ -17,17 +17,19 @@ class ReinforceAgent():
     https://www.youtube.com/watch?v=bRfUxQs6xIM&list=PLqYmG7hTraZDNJre23vqCGIVpfZ_K2RZs&index=10
     '''
     def __init__(self, state_size, action_size, gamma=0.99, seed=543, optimizer_learning_rate=0.005,
-                 optimizer_weight_decay=0.005):
+                 optimizer_weight_decay=0.005, hidden_size=128, batch_norm=False, dropout=False,
+                 activation='none', init=('const', 1)):
         self.gamma = gamma
 
-        self.policy_network = Policy(state_size, action_size, seed).to(device)
+        self.policy_network = Policy(state_size, action_size, seed, hidden_size, batch_norm, dropout, activation, init).to(device)
         self.optimizer = optim.Adam(self.policy_network.parameters(), lr=optimizer_learning_rate,
                                     weight_decay=optimizer_weight_decay)
         self.saved_log_probs = []
         self.episode_rewards = []
 
     def select_action(self, state):
-        state = torch.from_numpy(state).float().unsqueeze(0)
+        state = torch.from_numpy(state).float().unsqueeze(0).to(device)
+        self.policy_network.eval()
         probs = self.policy_network(state)
         m = Categorical(probs)
         action = m.sample()
@@ -35,6 +37,7 @@ class ReinforceAgent():
         return action.item()
 
     def learn(self, last_step_in_episode, done, reward, **kwargs):
+        self.policy_network.train()
         self.episode_rewards.append(reward)
         if last_step_in_episode or done:
             eps = np.finfo(np.float32).eps.item()
@@ -49,7 +52,7 @@ class ReinforceAgent():
                 # returns is an array in which returns[i] is the total discounted reward from step i onwards.
                 returns.insert(0, R)
 
-            returns = torch.tensor(returns)
+            returns = torch.tensor(returns).to(device)
             # Reduce variance
             returns = (returns - returns.mean()) / (returns.std() + eps)
             for log_prob, R in zip(self.saved_log_probs, returns):
@@ -63,31 +66,3 @@ class ReinforceAgent():
 
     def get_agent_model(self):
         return self.policy_network
-
-'''def main():
-    running_reward = 10
-    for i_episode in count(1):
-        state, ep_reward = env.reset(), 0
-        for t in range(1, 10000):  # Don't infinite loop while learning
-            action = select_action(state)
-            state, reward, done, _ = env.step(action)
-            if args.render:
-                env.render()
-            policy.rewards.append(reward)
-            ep_reward += reward
-            if done:
-                break
-
-        running_reward = 0.05 * ep_reward + (1 - 0.05) * running_reward
-        finish_episode()
-        if i_episode % args.log_interval == 0:
-            print('Episode {}\tLast reward: {:.2f}\tAverage reward: {:.2f}'.format(
-                  i_episode, ep_reward, running_reward))
-        if running_reward > env.spec.reward_threshold:
-            print("Solved! Running reward is now {} and "
-                  "the last episode runs to {} time steps!".format(running_reward, t))
-            break
-
-
-if __name__ == '__main__':
-    main()'''

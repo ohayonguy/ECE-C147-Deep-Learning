@@ -11,7 +11,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class DQNAgent():
     def __init__(self, state_size, action_size, seed=123, update_every=10, tau=1, gamma=1,
                  optimizer_learning_rate=0.005, optimizer_weight_decay=0.99, batch_size=1024,
-                 replay_buffer_size=1000000, eps_start=0.99, eps_end=0.1, eps_decay=0.99):
+                 replay_buffer_size=1000000, eps_start=0.99, eps_end=0.1, eps_decay=0.99,
+                 hidden_size=128, batch_norm=False, dropout=False, activation='none', init=('const', 1)):
         '''
         Initialize the DQN agent.
         @param state_size: the size of the observed state
@@ -66,8 +67,10 @@ class DQNAgent():
         self.eps_decay = eps_decay
 
         # Q-Network
-        self.qnetwork_local = QNetwork(state_size, action_size, seed).to(device)
-        self.qnetwork_target = QNetwork(state_size, action_size, seed).to(device)
+        self.qnetwork_local = QNetwork(state_size, action_size, seed, hidden_size, batch_norm, dropout,
+                                       activation, init).to(device)
+        self.qnetwork_target = QNetwork(state_size, action_size, seed, hidden_size, batch_norm, dropout,
+                                        activation, init).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=optimizer_learning_rate,
                                     weight_decay=optimizer_weight_decay)
 
