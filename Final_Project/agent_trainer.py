@@ -34,7 +34,7 @@ def trainer(env, agent, num_episodes=100000, num_steps_in_episode=5000, render=F
         scores_window.append(episode_score)  # save most recent score
         scores.append(episode_score)  # save most recent score
 
-        print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode, np.mean(scores_window)), end="")
+        #print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode, np.mean(scores_window)), end="")
         #if episode % 100 == 0:
         #    print('\rEpisode {}\tBest Score: {:.2f}'.format(episode, np.amax(scores_window)))
         if np.mean(scores_window) >= 475:
