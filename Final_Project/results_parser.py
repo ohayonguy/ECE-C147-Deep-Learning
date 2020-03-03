@@ -1,5 +1,6 @@
 import json
-file = 'dqn_results.json'
+'''
+file = 'dqn_results_exp_1.json'
 with open(file) as f:
     results = json.load(f)
 
@@ -39,7 +40,7 @@ print(best_models_bn)
 
 print("best for initialization:")
 print(best_models_init)
-'''    
+ 
 best_models = {}
 # Iterate hidden layer size. For each size, get best 3 models.
 hidden_sizes = [1, 10, 20, 80, 256]
@@ -62,3 +63,33 @@ for activation in activations:
 print(best_models)
 
 '''
+best_dqn_file = 'results/dqn_results_exp_2.json'
+best_reinforce_file = 'results/reinforce_results_exp_2.json'
+
+with open(best_dqn_file) as f:
+    dqn_results = json.load(f)
+
+with open(best_reinforce_file) as f:
+    reinforce_results = json.load(f)
+
+import numpy as np
+
+best_reinforce_parameters = None
+best_reinforce_perf = np.inf
+for result in reinforce_results:
+    if result['avg_num_of_episodes_to_solve'] < best_reinforce_perf:
+        best_reinforce_perf = result['avg_num_of_episodes_to_solve']
+        best_reinforce_parameters = result
+
+best_dqn_parameters = None
+best_dqn_perf = np.inf
+for result in dqn_results:
+    if result['avg_num_of_episodes_to_solve'] < best_dqn_perf:
+        best_dqn_perf = result['avg_num_of_episodes_to_solve']
+        best_dqn_parameters = result
+
+print("Best reinforce model hyperparameters:")
+print(best_reinforce_parameters)
+
+print("Best dqn model hyperparameters:")
+print(best_dqn_parameters)

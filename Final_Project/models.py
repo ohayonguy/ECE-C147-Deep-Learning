@@ -41,6 +41,8 @@ class QNetwork(nn.Module):
             if init[0] == 'xavier_uniform':
                 torch.nn.init.xavier_uniform_(self.affine1.weight)
                 torch.nn.init.xavier_uniform_(self.affine2.weight)
+            else:
+                raise Exception("Unsupported initialization")
 
     def forward(self, state):
         """Build a network that maps state -> action values."""

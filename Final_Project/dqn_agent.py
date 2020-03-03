@@ -10,8 +10,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class DQNAgent():
     def __init__(self, state_size, action_size, seed=123, update_every=10, tau=1, gamma=1,
-                 optimizer_learning_rate=0.005, optimizer_weight_decay=0.99, batch_size=1024,
-                 replay_buffer_size=1000000, eps_start=0.99, eps_end=0.1, eps_decay=0.99,
+                 optimizer_learning_rate=0.005, optimizer_weight_decay=0.99, batch_size=128,
+                 replay_buffer_size=1000000, eps_start=1, eps_end=0.1, eps_decay=0.996,
                  hidden_size=128, batch_norm=False, dropout=False, activation='none', init=('const', 1)):
         '''
         Initialize the DQN agent.
