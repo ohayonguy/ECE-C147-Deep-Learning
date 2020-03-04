@@ -12,7 +12,9 @@ env = gym.make('CartPole-v1')
 num_of_solutions_to_examine = 5
 
 batch_norms = [False, True]
-initializations = [('xavier_uniform', None)]
+initializations = [('const', 0.1), ('const', 30),
+                   ('uniform', 0.1), ('uniform', 30),
+                   ('pytorch_default', None), ('xavier_uniform', None)]
 activations = ['none', 'relu', 'leakyrelu', 'tanh']
 dropout_choices = [False]
 hidden_sizes = [1, 10, 20, 80, 256]

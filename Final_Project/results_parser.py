@@ -1,6 +1,6 @@
 import json
 
-file = './results/reinforce_results_exp_1.json'
+file = './results/dqn_results_exp_1.json'
 with open(file) as f:
     results = json.load(f)
 
