@@ -21,7 +21,7 @@ hidden_sizes = [200, 250, 300]
 weight_decayes = [0.5, 0.05, 0.005, 0.0005]
 bn = False
 activation = 'tanh'
-initialization = 'xavier_uniform'
+initialization = ('pytorch_default', None)
 for gamma in gammas:
     for optimizer_learning_rate in learning_rates:
         for hidden_size in hidden_sizes:

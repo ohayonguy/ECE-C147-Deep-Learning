@@ -12,16 +12,14 @@ env = gym.make('CartPole-v1')
 num_of_solutions_to_examine = 5
 
 batch_norms = [False, True]
-initializations = [('const', 0.1), ('const', 30),
-                   ('uniform', 0.1), ('uniform', 30),
-                   ('xavier_uniform', None)]
+initializations = [('xavier_uniform', None)]
 activations = ['none', 'relu', 'leakyrelu', 'tanh']
 dropout_choices = [False]
 hidden_sizes = [1, 10, 20, 80, 256]
 
 results = []
-dqn_results_file = open('dqn_results.txt', 'w')
-dqn_json_file = open('dqn_results.json', 'w')
+dqn_results_file = open('dqn_results_xavier.txt', 'w')
+dqn_json_file = open('dqn_results_xavier.json', 'w')
 k = 0
 for bn in batch_norms:
     for initialization in initializations:

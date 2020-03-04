@@ -1,6 +1,6 @@
 import json
-'''
-file = 'dqn_results_exp_1.json'
+
+file = './results/reinforce_results_exp_1.json'
 with open(file) as f:
     results = json.load(f)
 
@@ -8,7 +8,7 @@ with open(file) as f:
 batch_norms = [False, True]
 initializations = [['const', 0.1], ['const', 30],
                    ['uniform', 0.1], ['uniform', 30],
-                   'xavier_uniform']
+                   ['xavier_uniform', None], ['pytorch_default', None]]
 activations = ['none', 'relu', 'leakyrelu', 'tanh']
 dropout_choices = [False]
 hidden_sizes = [1, 10, 20, 80, 256]
@@ -40,7 +40,7 @@ print(best_models_bn)
 
 print("best for initialization:")
 print(best_models_init)
- 
+'''
 best_models = {}
 # Iterate hidden layer size. For each size, get best 3 models.
 hidden_sizes = [1, 10, 20, 80, 256]
@@ -61,6 +61,8 @@ for activation in activations:
     best_models['activation_'+str(activation)] = sorted_by_performance[1]
     best_models['activation_'+str(activation)] = sorted_by_performance[2]
 print(best_models)
+
+'''
 
 '''
 best_dqn_file = 'results/dqn_results_exp_2.json'
@@ -93,3 +95,4 @@ print(best_reinforce_parameters)
 
 print("Best dqn model hyperparameters:")
 print(best_dqn_parameters)
+'''

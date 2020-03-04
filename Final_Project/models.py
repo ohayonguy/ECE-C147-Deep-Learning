@@ -35,12 +35,14 @@ class QNetwork(nn.Module):
             if init[0] == 'uniform':
                 torch.nn.init.uniform_(self.affine1.weight, a=-init[1], b=init[1])
                 torch.nn.init.uniform_(self.affine2.weight, a=-init[1], b=init[1])
-            if init[0] == 'const':
+            elif init[0] == 'const':
                 torch.nn.init.constant_(self.affine1.weight, init[1])
                 torch.nn.init.constant_(self.affine2.weight, init[1])
-            if init[0] == 'xavier_uniform':
+            elif init[0] == 'xavier_uniform':
                 torch.nn.init.xavier_uniform_(self.affine1.weight)
                 torch.nn.init.xavier_uniform_(self.affine2.weight)
+            elif init[0] == 'pytorch_default':
+                pass
             else:
                 raise Exception("Unsupported initialization")
 
