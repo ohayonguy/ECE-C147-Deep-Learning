@@ -6,6 +6,22 @@ import json
 import matplotlib.pyplot as plt
 import torch
 import numpy as np
+
+'''
+This file was used to experiment with different things and should not be used.
+You should use experiment_1_results_parser.py and You should use experiment_2_results_parser.py
+to observe the results.
+'''
+
+
+
+
+
+
+
+
+
+
 '''
 Ideas:
 The DQN and REINFORCE neural network should be the same?, except for the softmax layer at the end. Try to explain why it
@@ -245,7 +261,7 @@ trainer(env, dqn_agent_preloaded, num_episodes=100000, num_steps_in_episode=550,
         solved_checkpoint_name='dqn_agent_solved.pth', verbose=True, save_checkpoint=False, render=True)
 
 
-'''
+
 
 
 
@@ -255,3 +271,4 @@ trainer(env, dqn_agent_preloaded, num_episodes=100000, num_steps_in_episode=550,
 env.close()
 #plt.plot(scores)
 #plt.show()
+'''

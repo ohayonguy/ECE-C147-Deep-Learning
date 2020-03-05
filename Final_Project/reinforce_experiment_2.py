@@ -11,9 +11,9 @@ env = gym.make('CartPole-v1')
 num_of_solutions_to_examine = 5
 
 results = []
-reinforce_json_file = open('results/best_reinforce_results_gamma_1.json', 'w')
+reinforce_json_file = open('best_reinforce_results.json', 'w')
 k = 0
-gammas = [1]
+gammas = gammas = [0.92, 0.96, 1]
 learning_rates = [0.5, 0.05, 0.005, 0.0005, 0.01]
 hidden_sizes = [8, 10, 12, 14, 16]
 weight_decayes = [0.5, 0.05, 0.005, 0.0005]

@@ -13,9 +13,9 @@ num_of_solutions_to_examine = 5
 
 
 results = []
-dqn_json_file = open('best_dqn_results_gamma_0.96.json', 'w')
+dqn_json_file = open('best_dqn_results', 'w')
 #k = 0
-gammas = [0.96]
+gammas = [0.92, 0.96, 1]
 learning_rates = [0.5, 0.05, 0.005, 0.0005, 0.01]
 hidden_sizes = [200, 250, 300]
 weight_decayes = [0.5, 0.05, 0.005, 0.0005]
